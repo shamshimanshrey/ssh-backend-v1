@@ -11,10 +11,12 @@ app.use(express.json());
 const userRoutes = require('./routes/userRoutes');
 const lobbyRouter = require('./routes/lobbyRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
+const uploadRoute = require('./routes/uploadRoutes.js');
 
 app.use('/api/user', userRoutes);
 app.use('/api/lobby', lobbyRouter);
 app.use('/api/session', sessionRoutes);
+app.use('/api/upload', uploadRoute);
 
 
 app.use((err, req, res, next) => {

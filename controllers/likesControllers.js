@@ -4,8 +4,8 @@ const User = require('../models/user')
 const likeUser = async (req, res) => {
     try {
 
-        const { mySessionID, targetSessionID, givenCompliment, isLike } = req.body;
-
+        const {  targetSessionID, givenCompliment, isLike } = req.body;
+        const mySessionID = req.user?.lobbyUserID
         if (!targetSessionID) {
             return res.status(400).json({ error: 'targetSessionID is required' });
         }
@@ -166,7 +166,7 @@ const likeUser = async (req, res) => {
 
 const likedList = async (req, res) => {
     try {
-        const { mySessionID } = req.body; // or req.body
+       const mySessionID = req.user?.lobbyUserID;
 
         if (!mySessionID) {
             return res.status(400).json({ error: 'mySessionID is required' });
@@ -188,7 +188,7 @@ const likedList = async (req, res) => {
             _id: { $in: allSessionIDs }
         }).populate('userID', '-preferences -_id');
 
-        const results = likedSessions.map(session => {
+         const results = likedSessions.map(session => {
             const sessionID = session._id.toString();
             const complimentObj = complimentedByObjs.find(c => c.sessionID.toString() === sessionID);
 
@@ -214,3 +214,8 @@ const likedList = async (req, res) => {
     }
 };
 module.exports = { likeUser, likedList }
+
+
+
+
+//check if the targetsessionID and mysessionID is in the same lobby or not, else user user will be able to like anyone form other lobby.

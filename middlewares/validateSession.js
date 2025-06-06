@@ -10,7 +10,8 @@ if(!userID || !lobbyID){
 
 const user = await User.exists({_id: userID});
 const lobby = await Lobby.findById(lobbyID);
-
+//check the userID if it is already present in a session. in the same lobby.
+// has to write not completed yet.
 if(!user){
     return res.status(404).json({error:"user not found"});
 }

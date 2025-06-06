@@ -7,3 +7,4 @@ router.post('/signup', signUpUser);
 router.get('/profile', profileData);
 
 module.exports = router;
+

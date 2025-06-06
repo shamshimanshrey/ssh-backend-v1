@@ -1,9 +1,12 @@
 const Session = require('../models/session');
 const User = require('../models/user');
+const {generateAccessToken, generateRefreshToken} = require('../Utils/jwtUtils')
 
 const enterLobby = async (req, res) => {
     try {
         const { userID, lobbyID } = req.body;
+
+
 
         const session = await Session.create({
             userID,
@@ -12,14 +15,28 @@ const enterLobby = async (req, res) => {
             likes: [],
             compliments: [],
         })
+        const accessToken = generateAccessToken({ userID:userID, lobbyUserID: session._id });
+        const refreshToken = await generateRefreshToken(userID);
 
         const { coordinates } = req.lobby.lobbyLocation;
+        const radius = req.lobby.radius;
 
-        res.status(201).json({
-            message: 'session created',
-            sessionID: session._id,
-            lobbyLocation: coordinates,
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict',
+            maxAge: 1000 * 60 * 60 * 24
         })
+        
+        res.setHeader('x-access-token', accessToken);
+
+        return res.status(201).json({
+            message: 'session created',
+            radius: radius,
+            lobbyLocation: coordinates,
+
+        })
+
     } catch (error) {
         console.error('Create Session Error:', error.message);
         res.status(500).json({ error: 'Server error' });
@@ -29,7 +46,8 @@ const enterLobby = async (req, res) => {
 const getSessions = async (req, res) => {
 
     try {
-        const { sessionID } = req.body;
+        
+        const sessionID = req.user?.lobbyUserID;
         if (!sessionID) {
             return res.status(400).json({ error: 'sessionID is required' });
         }
@@ -74,6 +92,11 @@ const getSessions = async (req, res) => {
         console.error('Error fetching lobby sessions:', error);
         res.status(500).json({ error: 'Server error' });
     }
+}
+
+
+const updatePofileData = async (req,res) =>{
+
 }
 
 
